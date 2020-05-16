@@ -1,0 +1,14 @@
+version: '3'
+
+services:
+  dash:
+    container_name: dash
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      - DEBUG=True
+      - HOST=0.0.0.0
+      - PORT=8000
+    ports:
+      - 8000:8000
