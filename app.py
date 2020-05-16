@@ -5,10 +5,13 @@ from ast import literal_eval
 import dash
 import dash_core_components as dcc
 import dash_html_components as html
+from flask import Flask
 
-external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
-app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
+server = Flask('Dash')
+server.secret_key = os.environ.get('SECRET_KEY', 'secret123')
+
+app = dash.Dash(__name__, server=server)
 
 app.layout = html.Div(children=[
     html.H1(children='Hello Dash'),
@@ -30,6 +33,11 @@ app.layout = html.Div(children=[
         }
     )
 ])
+
+external_css = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
+
+for css in external_css:
+    app.css.append_css({"external_url": css})
 
 if __name__ == '__main__':
     app.run_server(
