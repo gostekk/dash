@@ -34,6 +34,6 @@ app.layout = html.Div(children=[
 if __name__ == '__main__':
     app.run_server(
         debug=literal_eval(os.environ.get('DEBUG', 'True')),
-        host='0.0.0.0',
+        host=os.environ.get('HOST', '0.0.0.0'),
         port=literal_eval(os.environ.get('PORT', '8000'))
-)
+    )
