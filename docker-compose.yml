@@ -10,5 +10,6 @@ services:
       - DEBUG=True
       - HOST=0.0.0.0
       - PORT=8000
+      - SECRET_KEY=abcdfghijklmnoopprst
     ports:
       - 8000:8000
