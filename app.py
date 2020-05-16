@@ -11,10 +11,7 @@ from flask import Flask
 server = Flask('Dash')
 server.secret_key = os.environ.get('SECRET_KEY', 'secret123')
 
-
-external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
-
-app = dash.Dash(__name__, server=server, external_stylesheets=external_stylesheets)
+app = dash.Dash(__name__, server=server)
 
 app.layout = html.Div(children=[
     html.H1(children='Hello Dash'),
@@ -36,6 +33,11 @@ app.layout = html.Div(children=[
         }
     )
 ])
+
+external_css = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
+
+for css in external_css:
+    app.css.append_css({"external_url": css})
 
 if __name__ == '__main__':
     app.run_server(
