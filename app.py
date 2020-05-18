@@ -41,6 +41,9 @@ with server.app_context():
     have_hobbyist = get_data('SELECT * FROM data WHERE Hobbyist = "Yes"')
     no_have_hobbyist = get_data('SELECT * FROM data WHERE Hobbyist = "No"')
     never = get_data('SELECT * FROM data WHERE OpenSourcer = "Never"')
+    no_student = get_data('SELECT * FROM data WHERE Student = "No"')
+    full_time_student = get_data('SELECT * FROM data WHERE Student = "Yes, full-time"')
+    part_time_student = get_data('SELECT * FROM data WHERE Student = "Yes, part-time"')
     lt_once_year = get_data('SELECT * FROM data WHERE OpenSourcer = "Less than once per year"')
     lt_once_month_gt_once_year = get_data(
         "SELECT * FROM data WHERE OpenSourcer = \"Less than once a month but more than once per year\"")
@@ -49,40 +52,72 @@ with server.app_context():
 
 app.layout = html.Div(children=[
 
-    html.H2(style={
-      'text-align': 'center'
-    }, children='Developer Profile'),
-
-    dcc.Graph(
-        id='hobbyist',
-        figure={
-            'data': [
-                {'x': ["Yes"], 'y': [len(have_hobbyist)], 'type': 'bar', 'name': 'Yes'},
-                {'x': ["No"], 'y': [len(no_have_hobbyist)], 'type': 'bar', 'name': 'No'},
-            ],
-            'layout': {
-                'title': 'Coding as a Hobby'
-            }
-        }
+    html.Div(style={
+        'textAlign': 'center',
+    }, children=[
+            html.H2(
+                children='Developer Profile',
+            ),
+        ]
     ),
 
-    dcc.Graph(
-        id='open_sourcer',
-        figure={
-            'data': [
-                {'x': ["Once a month or more often"], 'y': [len(ge_once_month)], 'type': 'bar',
-                 'name': 'Once a month or more often'},
-                {'x': ["Less than once a month..."], 'y': [len(lt_once_month_gt_once_year)]
-                    , 'type': 'bar', 'name': 'Less than once a month but more than once per year'},
-                {'x': ["Less than once per year"], 'y': [len(lt_once_year)], 'type': 'bar',
-                 'name': 'Less than once per year'},
-                {'x': ["Never"], 'y': [len(never)], 'type': 'bar', 'name': 'Never'},
-            ],
-            'layout': {
-                'title': 'Contributing to Open Source'
+    html.Div(style={
+        'float': 'left',
+        'margin-left': '55px'
+    }, children=[
+        dcc.Graph(
+            id='hobbyist',
+            figure={
+                'data': [
+                    {'x': ["Yes"], 'y': [len(have_hobbyist)], 'type': 'bar', 'name': 'Yes'},
+                    {'x': ["No"], 'y': [len(no_have_hobbyist)], 'type': 'bar', 'name': 'No'},
+                ],
+                'layout': {
+                    'title': 'Coding as a Hobby'
+                }
             }
-        }
-    )
+        ),
+    ]),
+
+    html.Div(style={
+        'float': 'left',
+    }, children=[
+        dcc.Graph(
+            id='student',
+            figure={
+                'data': [
+                    {'x': ["No"], 'y': [len(no_student)], 'type': 'bar', 'name': 'No'},
+                    {'x': ["Yes, full-time"], 'y': [len(full_time_student)], 'type': 'bar', 'name': 'Yes, full-time'},
+                    {'x': ["Yes, part-time"], 'y': [len(lt_once_year)], 'type': 'bar', 'name': 'Yes, part-time'},
+                ],
+                'layout': {
+                    'title': 'How Many Developers are Students?'
+                }
+            }
+        ),
+    ]),
+
+    html.Div(style={'clear': 'both'}),
+
+    html.Div(children=[
+        dcc.Graph(
+            id='open_sourcer',
+            figure={
+                'data': [
+                    {'x': ["Once a month or more often"], 'y': [len(ge_once_month)], 'type': 'bar',
+                     'name': 'Once a month or more often'},
+                    {'x': ["Less than once a month..."], 'y': [len(lt_once_month_gt_once_year)]
+                        , 'type': 'bar', 'name': 'Less than once a month but more than once per year'},
+                    {'x': ["Less than once per year"], 'y': [len(lt_once_year)], 'type': 'bar',
+                     'name': 'Less than once per year'},
+                    {'x': ["Never"], 'y': [len(never)], 'type': 'bar', 'name': 'Never'},
+                ],
+                'layout': {
+                    'title': 'Contributing to Open Source'
+                }
+            }
+        ),
+    ])
 ])
 
 external_css = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
