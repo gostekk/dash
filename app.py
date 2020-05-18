@@ -30,22 +30,56 @@ def close_connection(exception):
         db.close()
 
 
-app.layout = html.Div(children=[
-    html.H1(children='Hello Dash'),
+def get_data(query):
+    cur = get_db().cursor()
+    cur.execute(query)
+    rows = cur.fetchall()
+    return rows
 
-    html.Div(children='''
-        Dash: A web application framework for Python.
-    '''),
+
+with server.app_context():
+    have_hobbyist = get_data('SELECT * FROM data WHERE Hobbyist = "Yes"')
+    no_have_hobbyist = get_data('SELECT * FROM data WHERE Hobbyist = "No"')
+    never = get_data('SELECT * FROM data WHERE OpenSourcer = "Never"')
+    lt_once_year = get_data('SELECT * FROM data WHERE OpenSourcer = "Less than once per year"')
+    lt_once_month_gt_once_year = get_data(
+        "SELECT * FROM data WHERE OpenSourcer = \"Less than once a month but more than once per year\"")
+    ge_once_month = get_data('SELECT * FROM data WHERE OpenSourcer = "Once a month or more often"')
+
+
+app.layout = html.Div(children=[
+
+    html.H2(style={
+      'text-align': 'center'
+    }, children='Developer Profile'),
 
     dcc.Graph(
-        id='example-graph',
+        id='hobbyist',
         figure={
             'data': [
-                {'x': [1, 2, 3], 'y': [4, 1, 2], 'type': 'bar', 'name': 'SF'},
-                {'x': [1, 2, 3], 'y': [2, 4, 5], 'type': 'bar', 'name': u'Montréal'},
+                {'x': ["Yes"], 'y': [len(have_hobbyist)], 'type': 'bar', 'name': 'Yes'},
+                {'x': ["No"], 'y': [len(no_have_hobbyist)], 'type': 'bar', 'name': 'No'},
             ],
             'layout': {
-                'title': 'Dash Data Visualization'
+                'title': 'Coding as a Hobby'
+            }
+        }
+    ),
+
+    dcc.Graph(
+        id='open_sourcer',
+        figure={
+            'data': [
+                {'x': ["Once a month or more often"], 'y': [len(ge_once_month)], 'type': 'bar',
+                 'name': 'Once a month or more often'},
+                {'x': ["Less than once a month..."], 'y': [len(lt_once_month_gt_once_year)]
+                    , 'type': 'bar', 'name': 'Less than once a month but more than once per year'},
+                {'x': ["Less than once per year"], 'y': [len(lt_once_year)], 'type': 'bar',
+                 'name': 'Less than once per year'},
+                {'x': ["Never"], 'y': [len(never)], 'type': 'bar', 'name': 'Never'},
+            ],
+            'layout': {
+                'title': 'Contributing to Open Source'
             }
         }
     )
