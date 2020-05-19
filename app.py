@@ -6,6 +6,7 @@ from ast import literal_eval
 import dash
 import dash_core_components as dcc
 import dash_html_components as html
+from dash.dependencies import Input, Output
 from flask import Flask, g
 
 DATABASE = './db.sqlite3'
@@ -49,76 +50,93 @@ with server.app_context():
         "SELECT * FROM data WHERE OpenSourcer = \"Less than once a month but more than once per year\"")
     ge_once_month = get_data('SELECT * FROM data WHERE OpenSourcer = "Once a month or more often"')
 
+category = ['Developer Roles', 'Education']
 
 app.layout = html.Div(children=[
 
     html.Div(style={
         'textAlign': 'center',
     }, children=[
-            html.H2(
-                children='Developer Profile',
-            ),
-        ]
-    ),
-
-    html.Div(style={
-        'float': 'left',
-        'margin-left': '55px'
-    }, children=[
-        dcc.Graph(
-            id='hobbyist',
-            figure={
-                'data': [
-                    {'x': ["Yes"], 'y': [len(have_hobbyist)], 'type': 'bar', 'name': 'Yes'},
-                    {'x': ["No"], 'y': [len(no_have_hobbyist)], 'type': 'bar', 'name': 'No'},
-                ],
-                'layout': {
-                    'title': 'Coding as a Hobby'
-                }
-            }
+        html.H2(
+            children='Developer Profile',
         ),
     ]),
 
-    html.Div(style={
-        'float': 'left',
-    }, children=[
-        dcc.Graph(
-            id='student',
-            figure={
-                'data': [
-                    {'x': ["No"], 'y': [len(no_student)], 'type': 'bar', 'name': 'No'},
-                    {'x': ["Yes, full-time"], 'y': [len(full_time_student)], 'type': 'bar', 'name': 'Yes, full-time'},
-                    {'x': ["Yes, part-time"], 'y': [len(lt_once_year)], 'type': 'bar', 'name': 'Yes, part-time'},
-                ],
-                'layout': {
-                    'title': 'How Many Developers are Students?'
-                }
-            }
-        ),
+    html.Div([
+        dcc.Dropdown(
+            id='category',
+            options=[{'label': i, 'value': i} for i in category],
+            value='Developer Roles'
+        )
     ]),
 
-    html.Div(style={'clear': 'both'}),
-
-    html.Div(children=[
-        dcc.Graph(
-            id='open_sourcer',
-            figure={
-                'data': [
-                    {'x': ["Once a month or more often"], 'y': [len(ge_once_month)], 'type': 'bar',
-                     'name': 'Once a month or more often'},
-                    {'x': ["Less than once a month..."], 'y': [len(lt_once_month_gt_once_year)]
-                        , 'type': 'bar', 'name': 'Less than once a month but more than once per year'},
-                    {'x': ["Less than once per year"], 'y': [len(lt_once_year)], 'type': 'bar',
-                     'name': 'Less than once per year'},
-                    {'x': ["Never"], 'y': [len(never)], 'type': 'bar', 'name': 'Never'},
-                ],
-                'layout': {
-                    'title': 'Contributing to Open Source'
-                }
-            }
-        ),
-    ])
+    html.Div(id='content')
 ])
+
+
+@app.callback(
+    Output('content', 'children'),
+    [Input('category', 'value')]
+)
+def update_content(category_name):
+    if category_name == 'Developer Roles':
+        return [
+            html.Div(children=[
+                dcc.Graph(
+                    id='hobbyist',
+                    figure={
+                        'data': [
+                            {'x': ["Yes"], 'y': [len(have_hobbyist)], 'type': 'bar', 'name': 'Yes'},
+                            {'x': ["No"], 'y': [len(no_have_hobbyist)], 'type': 'bar', 'name': 'No'},
+                        ],
+                        'layout': {
+                            'title': 'Coding as a Hobby'
+                        }
+                    }
+                ),
+            ]),
+
+            html.Div(children=[
+                dcc.Graph(
+                    id='open_sourcer',
+                    figure={
+                        'data': [
+                            {'x': ["Once a month or more often"], 'y': [len(ge_once_month)], 'type': 'bar',
+                             'name': 'Once a month or more often'},
+                            {'x': ["Less than once a month..."], 'y': [len(lt_once_month_gt_once_year)]
+                                , 'type': 'bar', 'name': 'Less than once a month but more than once per year'},
+                            {'x': ["Less than once per year"], 'y': [len(lt_once_year)], 'type': 'bar',
+                             'name': 'Less than once per year'},
+                            {'x': ["Never"], 'y': [len(never)], 'type': 'bar', 'name': 'Never'},
+                        ],
+                        'layout': {
+                            'title': 'Contributing to Open Source'
+                        }
+                    }
+                ),
+            ]),
+        ]
+    else:
+        return [
+            html.Div(children=[
+                dcc.Graph(
+                    id='student',
+                    figure={
+                        'data': [
+                            {'x': ["No"], 'y': [len(no_student)], 'type': 'bar', 'name': 'No'},
+                            {'x': ["Yes, full-time"], 'y': [len(full_time_student)], 'type': 'bar',
+                             'name': 'Yes, full-time'},
+                            {'x': ["Yes, part-time"], 'y': [len(lt_once_year)], 'type': 'bar',
+                             'name': 'Yes, part-time'},
+                        ],
+                        'layout': {
+                            'title': 'How Many Developers are Students?'
+                        }
+                    }
+                ),
+            ]),
+        ]
+
 
 external_css = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
