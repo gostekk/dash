@@ -47,8 +47,16 @@ with server.app_context():
     part_time_student = get_data('SELECT * FROM data WHERE Student = "Yes, part-time"')
     lt_once_year = get_data('SELECT * FROM data WHERE OpenSourcer = "Less than once per year"')
     lt_once_month_gt_once_year = get_data(
-        "SELECT * FROM data WHERE OpenSourcer = \"Less than once a month but more than once per year\"")
+        'SELECT * FROM data WHERE OpenSourcer = "Less than once a month but more than once per year"')
     ge_once_month = get_data('SELECT * FROM data WHERE OpenSourcer = "Once a month or more often"')
+    developer_full_stack = get_data('SELECT * FROM data WHERE DevType LIKE "%Developer, full-stack%"')
+    developer_back_end = get_data('SELECT * FROM data WHERE DevType LIKE "%Developer, back-end%"')
+    developer_front_end = get_data('SELECT * FROM data WHERE DevType LIKE "%Developer, front-end%"')
+    developer_desktop = get_data(
+        'SELECT * FROM data WHERE DevType LIKE "%Developer, desktop or enterprise applications%"')
+    developer_mobile = get_data('SELECT * FROM data WHERE DevType LIKE "%Developer, mobile%"')
+    developer_test = get_data('SELECT * FROM data WHERE DevType LIKE "%Developer, QA or test%"')
+    developer_game_graphics = get_data('SELECT * FROM data WHERE DevType LIKE "%Developer, game or graphics%"')
 
 category = ['Developer Roles', 'Education']
 
@@ -81,6 +89,33 @@ app.layout = html.Div(children=[
 def update_content(category_name):
     if category_name == 'Developer Roles':
         return [
+            html.Div(children=[
+                dcc.Graph(
+                    id='developer_type',
+                    figure={
+                        'data': [
+                            {'x': ["Full-stack"], 'y': [len(developer_full_stack)], 'type': 'bar',
+                             'name': 'Developer, full-stack'},
+                            {'x': ["Back-end"], 'y': [len(developer_back_end)], 'type': 'bar',
+                             'name': 'Developer, back-end'},
+                            {'x': ["Front-end"], 'y': [len(developer_front_end)], 'type': 'bar',
+                             'name': 'Developer, front-end'},
+                            {'x': ["Desktop or enterprise applications"], 'y': [len(developer_desktop)],
+                             'type': 'bar', 'name': 'Developer, desktop or enterprise applications'},
+                            {'x': ["Mobile"], 'y': [len(developer_mobile)], 'type': 'bar',
+                             'name': 'Developer, mobile'},
+                            {'x': ["QA or test"], 'y': [len(developer_test)], 'type': 'bar',
+                             'name': 'Developer, QA or test'},
+                            {'x': ["Game or graphics"], 'y': [len(developer_game_graphics)], 'type': 'bar',
+                             'name': 'Developer, game or graphics'},
+                        ],
+                        'layout': {
+                            'title': 'Developer Type'
+                        }
+                    }
+                ),
+            ]),
+
             html.Div(children=[
                 dcc.Graph(
                     id='hobbyist',
