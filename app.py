@@ -52,6 +52,8 @@ with server.app_context():
     developer_test = get_data('SELECT DevType FROM data WHERE DevType LIKE "%Developer, QA or test%"')
     developer_game_graphics = get_data('SELECT DevType FROM data WHERE DevType LIKE "%Developer, game or graphics%"')
     educational = get_data('SELECT EDLevel, COUNT(EDlevel) FROM data WHERE EDLevel != "NA" GROUP BY EDLevel')
+    undergrad_major = get_data(
+        'SELECT UndergradMajor, COUNT(UndergradMajor) FROM data WHERE UndergradMajor != "NA" GROUP BY UndergradMajor')
 
 category = ['Developer Roles', 'Education']
 
@@ -191,6 +193,43 @@ def update_content(category_name):
                         ],
                         'layout': {
                             'title': 'Educational Attainment'
+                        }
+                    }
+                ),
+            ]),
+
+            html.Div(children=[
+                dcc.Graph(
+                    id='undergraduate_major',
+                    figure={
+                        'data': [
+                            {'x': ['Computer science...'], 'y': [undergrad_major[6][1]], 'type': 'bar',
+                             'name': undergrad_major[6][0]},
+                            {'x': ['Another engineering...'], 'y': [undergrad_major[5][1]], 'type': 'bar',
+                             'name': undergrad_major[5][0]},
+                            {'x': ['Information systems...'], 'y': [undergrad_major[9][1]], 'type': 'bar',
+                             'name': undergrad_major[9][0]},
+                            {'x': ['Web development...'], 'y': [undergrad_major[11][1]], 'type': 'bar',
+                             'name': undergrad_major[11][0]},
+                            {'x': ['Natural science'], 'y': [undergrad_major[3][1]], 'type': 'bar',
+                             'name': undergrad_major[3][0]},
+                            {'x': ['Mathematics...'], 'y': [undergrad_major[10][1]], 'type': 'bar',
+                             'name': undergrad_major[10][0]},
+                            {'x': ['Business discipline'], 'y': [undergrad_major[0][1]], 'type': 'bar',
+                             'name': undergrad_major[0][0]},
+                            {'x': ['Humanities discipline'], 'y': [undergrad_major[2][1]], 'type': 'bar',
+                             'name': undergrad_major[2][0]},
+                            {'x': ['Social science'], 'y': [undergrad_major[4][1]], 'type': 'bar',
+                             'name': undergrad_major[4][0]},
+                            {'x': ['Fine arts...'], 'y': [undergrad_major[7][1]], 'type': 'bar',
+                             'name': undergrad_major[7][0]},
+                            {'x': ['Any declared a major'], 'y': [undergrad_major[8][1]], 'type': 'bar',
+                             'name': undergrad_major[8][0]},
+                            {'x': ['Health science'], 'y': [undergrad_major[1][1]], 'type': 'bar',
+                             'name': undergrad_major[1][0]},
+                        ],
+                        'layout': {
+                            'title': 'Undergraduate Major'
                         }
                     }
                 ),
