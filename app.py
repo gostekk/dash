@@ -39,24 +39,19 @@ def get_data(query):
 
 
 with server.app_context():
-    have_hobbyist = get_data('SELECT * FROM data WHERE Hobbyist = "Yes"')
-    no_have_hobbyist = get_data('SELECT * FROM data WHERE Hobbyist = "No"')
+    hobbyist = get_data('SELECT Hobbyist, COUNT(Hobbyist) FROM data GROUP BY Hobbyist')
     never = get_data('SELECT * FROM data WHERE OpenSourcer = "Never"')
-    no_student = get_data('SELECT * FROM data WHERE Student = "No"')
-    full_time_student = get_data('SELECT * FROM data WHERE Student = "Yes, full-time"')
-    part_time_student = get_data('SELECT * FROM data WHERE Student = "Yes, part-time"')
-    lt_once_year = get_data('SELECT * FROM data WHERE OpenSourcer = "Less than once per year"')
-    lt_once_month_gt_once_year = get_data(
-        'SELECT * FROM data WHERE OpenSourcer = "Less than once a month but more than once per year"')
-    ge_once_month = get_data('SELECT * FROM data WHERE OpenSourcer = "Once a month or more often"')
+    open_source = get_data('SELECT OpenSourcer, COUNT(OpenSourcer) FROM data GROUP BY OpenSourcer')
+    student = get_data('SELECT Student, COUNT(Student) FROM data WHERE Student != "NA" GROUP BY Student')
     developer_full_stack = get_data('SELECT * FROM data WHERE DevType LIKE "%Developer, full-stack%"')
     developer_back_end = get_data('SELECT * FROM data WHERE DevType LIKE "%Developer, back-end%"')
     developer_front_end = get_data('SELECT * FROM data WHERE DevType LIKE "%Developer, front-end%"')
     developer_desktop = get_data(
-        'SELECT * FROM data WHERE DevType LIKE "%Developer, desktop or enterprise applications%"')
-    developer_mobile = get_data('SELECT * FROM data WHERE DevType LIKE "%Developer, mobile%"')
-    developer_test = get_data('SELECT * FROM data WHERE DevType LIKE "%Developer, QA or test%"')
-    developer_game_graphics = get_data('SELECT * FROM data WHERE DevType LIKE "%Developer, game or graphics%"')
+        'SELECT DevType FROM data WHERE DevType LIKE "%Developer, desktop or enterprise applications%"')
+    developer_mobile = get_data('SELECT DevType FROM data WHERE DevType LIKE "%Developer, mobile%"')
+    developer_test = get_data('SELECT DevType FROM data WHERE DevType LIKE "%Developer, QA or test%"')
+    developer_game_graphics = get_data('SELECT DevType FROM data WHERE DevType LIKE "%Developer, game or graphics%"')
+    educational = get_data('SELECT EDLevel, COUNT(EDlevel) FROM data WHERE EDLevel != "NA" GROUP BY EDLevel')
 
 category = ['Developer Roles', 'Education']
 
@@ -121,8 +116,8 @@ def update_content(category_name):
                     id='hobbyist',
                     figure={
                         'data': [
-                            {'x': ["Yes"], 'y': [len(have_hobbyist)], 'type': 'bar', 'name': 'Yes'},
-                            {'x': ["No"], 'y': [len(no_have_hobbyist)], 'type': 'bar', 'name': 'No'},
+                            {'x': [hobbyist[1][0]], 'y': [hobbyist[1][1]], 'type': 'bar', 'name': hobbyist[1][0]},
+                            {'x': [hobbyist[0][0]], 'y': [hobbyist[0][1]], 'type': 'bar', 'name': hobbyist[0][0]},
                         ],
                         'layout': {
                             'title': 'Coding as a Hobby'
@@ -136,13 +131,14 @@ def update_content(category_name):
                     id='open_sourcer',
                     figure={
                         'data': [
-                            {'x': ["Once a month or more often"], 'y': [len(ge_once_month)], 'type': 'bar',
-                             'name': 'Once a month or more often'},
-                            {'x': ["Less than once a month..."], 'y': [len(lt_once_month_gt_once_year)]
-                                , 'type': 'bar', 'name': 'Less than once a month but more than once per year'},
-                            {'x': ["Less than once per year"], 'y': [len(lt_once_year)], 'type': 'bar',
-                             'name': 'Less than once per year'},
-                            {'x': ["Never"], 'y': [len(never)], 'type': 'bar', 'name': 'Never'},
+                            {'x': [open_source[0][0]], 'y': [open_source[0][1]], 'type': 'bar',
+                             'name': open_source[0][0]},
+                            {'x': [open_source[1][0]], 'y': [open_source[1][1]]
+                                , 'type': 'bar', 'name': open_source[1][0]},
+                            {'x': [open_source[2][0]], 'y': [open_source[2][1]], 'type': 'bar',
+                             'name': open_source[2][0]},
+                            {'x': [open_source[3][0]], 'y': [open_source[3][1]], 'type': 'bar',
+                             'name': open_source[3][0]},
                         ],
                         'layout': {
                             'title': 'Contributing to Open Source'
@@ -158,14 +154,43 @@ def update_content(category_name):
                     id='student',
                     figure={
                         'data': [
-                            {'x': ["No"], 'y': [len(no_student)], 'type': 'bar', 'name': 'No'},
-                            {'x': ["Yes, full-time"], 'y': [len(full_time_student)], 'type': 'bar',
-                             'name': 'Yes, full-time'},
-                            {'x': ["Yes, part-time"], 'y': [len(lt_once_year)], 'type': 'bar',
-                             'name': 'Yes, part-time'},
+                            {'x': [student[0][0]], 'y': [student[0][1]], 'type': 'bar', 'name': student[0][0]},
+                            {'x': [student[1][0]], 'y': [student[1][1]], 'type': 'bar', 'name': student[1][0]},
+                            {'x': [student[2][0]], 'y': [student[2][1]], 'type': 'bar', 'name': student[2][0]},
                         ],
                         'layout': {
                             'title': 'How Many Developers are Students?'
+                        }
+                    }
+                ),
+            ]),
+
+            html.Div(children=[
+                dcc.Graph(
+                    id='educational_attainment',
+                    figure={
+                        'data': [
+                            {'x': ['Any formal education'], 'y': [educational[2][1]], 'type': 'bar',
+                             'name': educational[2][0]},
+                            {'x': ['Primary school'], 'y': [educational[5][1]], 'type': 'bar',
+                             'name': educational[5][0]},
+                            {'x': ['Secondary school'], 'y': [educational[7][1]], 'type': 'bar',
+                             'name': educational[7][0]},
+                            {'x': ['Some college'], 'y': [educational[8][1]], 'type': 'bar',
+                             'name': educational[8][0]},
+                            {'x': ['Associate degree'], 'y': [educational[0][1]], 'type': 'bar',
+                             'name': educational[0][0]},
+                            {'x': ["Bachelor's degree"], 'y': [educational[1][1]], 'type': 'bar',
+                             'name': educational[1][0]},
+                            {'x': ['Master degree'], 'y': [educational[3][1]], 'type': 'bar',
+                             'name': educational[3][0]},
+                            {'x': ['Professional degree'], 'y': [educational[6][1]], 'type': 'bar',
+                             'name': educational[6][0]},
+                            {'x': ['Doctoral degree'], 'y': [educational[4][1]], 'type': 'bar',
+                             'name': educational[4][0]},
+                        ],
+                        'layout': {
+                            'title': 'Educational Attainment'
                         }
                     }
                 ),
