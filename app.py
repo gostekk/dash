@@ -58,6 +58,17 @@ with server.app_context():
     years_code_pro = get_data(
         'SELECT YearsCodePro, COUNT(YearsCodePro) FROM data WHERE YearsCodePro != "NA" GROUP BY YearsCodePro')
 
+all_developers = len(developer_full_stack) + len(developer_back_end) + len(developer_front_end) \
+                 + len(developer_desktop) + len(developer_mobile) + len(developer_test) + len(developer_game_graphics)
+
+all_open_source = 0
+for i in range(len(open_source)):
+    all_open_source += open_source[i][1]
+
+all_educational = 0
+for i in range(len(educational)):
+    all_educational += educational[i][1]
+
 years_since_learning_code = []
 years_coding_professionally = []
 
@@ -135,20 +146,21 @@ def update_content(category_name):
                     id='developer_type',
                     figure={
                         'data': [
-                            {'x': ["Full-stack"], 'y': [len(developer_full_stack)], 'type': 'bar',
-                             'name': 'Developer, full-stack'},
-                            {'x': ["Back-end"], 'y': [len(developer_back_end)], 'type': 'bar',
+                            {'x': ["Full-stack"], 'y': [(len(developer_full_stack) / all_developers) * 100],
+                             'type': 'bar', 'name': 'Developer, full-stack'},
+                            {'x': ["Back-end"], 'y': [(len(developer_back_end) / all_developers) * 100], 'type': 'bar',
                              'name': 'Developer, back-end'},
-                            {'x': ["Front-end"], 'y': [len(developer_front_end)], 'type': 'bar',
+                            {'x': ["Front-end"], 'y': [(len(developer_front_end) / all_developers) * 100], 'type': 'bar',
                              'name': 'Developer, front-end'},
-                            {'x': ["Desktop or enterprise applications"], 'y': [len(developer_desktop)],
-                             'type': 'bar', 'name': 'Developer, desktop or enterprise applications'},
-                            {'x': ["Mobile"], 'y': [len(developer_mobile)], 'type': 'bar',
+                            {'x': ["Desktop or enterprise applications"],
+                             'y': [(len(developer_desktop) / all_developers) * 100], 'type': 'bar',
+                             'name': 'Developer, desktop or enterprise applications'},
+                            {'x': ["Mobile"], 'y': [(len(developer_mobile) / all_developers) * 100], 'type': 'bar',
                              'name': 'Developer, mobile'},
-                            {'x': ["QA or test"], 'y': [len(developer_test)], 'type': 'bar',
+                            {'x': ["QA or test"], 'y': [(len(developer_test) / all_developers * 100)], 'type': 'bar',
                              'name': 'Developer, QA or test'},
-                            {'x': ["Game or graphics"], 'y': [len(developer_game_graphics)], 'type': 'bar',
-                             'name': 'Developer, game or graphics'},
+                            {'x': ["Game or graphics"], 'y': [(len(developer_game_graphics) / all_developers) * 100],
+                             'type': 'bar', 'name': 'Developer, game or graphics'},
                         ],
                         'layout': {
                             'title': 'Developer Type'
@@ -180,13 +192,13 @@ def update_content(category_name):
                     id='open_sourcer',
                     figure={
                         'data': [
-                            {'x': [open_source[0][0]], 'y': [open_source[0][1]], 'type': 'bar',
+                            {'x': [open_source[0][0]], 'y': [(open_source[0][1] / all_open_source) * 100], 'type': 'bar',
                              'name': open_source[0][0]},
-                            {'x': [open_source[1][0]], 'y': [open_source[1][1]]
+                            {'x': [open_source[1][0]], 'y': [(open_source[1][1] / all_open_source) * 100]
                                 , 'type': 'bar', 'name': open_source[1][0]},
-                            {'x': [open_source[2][0]], 'y': [open_source[2][1]], 'type': 'bar',
+                            {'x': [open_source[2][0]], 'y': [(open_source[2][1] / all_open_source * 100)], 'type': 'bar',
                              'name': open_source[2][0]},
-                            {'x': [open_source[3][0]], 'y': [open_source[3][1]], 'type': 'bar',
+                            {'x': [open_source[3][0]], 'y': [(open_source[3][1] / all_open_source * 100)], 'type': 'bar',
                              'name': open_source[3][0]},
                         ],
                         'layout': {
@@ -221,23 +233,23 @@ def update_content(category_name):
                     id='educational_attainment',
                     figure={
                         'data': [
-                            {'x': ['Any formal education'], 'y': [educational[2][1]], 'type': 'bar',
+                            {'x': ['Any formal education'], 'y': [(educational[2][1] / all_educational) * 100], 'type': 'bar',
                              'name': educational[2][0]},
-                            {'x': ['Primary school'], 'y': [educational[5][1]], 'type': 'bar',
+                            {'x': ['Primary school'], 'y': [(educational[5][1] / all_educational) * 100], 'type': 'bar',
                              'name': educational[5][0]},
-                            {'x': ['Secondary school'], 'y': [educational[7][1]], 'type': 'bar',
+                            {'x': ['Secondary school'], 'y': [(educational[7][1] / all_educational) * 100], 'type': 'bar',
                              'name': educational[7][0]},
-                            {'x': ['Some college'], 'y': [educational[8][1]], 'type': 'bar',
+                            {'x': ['Some college'], 'y': [(educational[8][1] / all_educational) * 100], 'type': 'bar',
                              'name': educational[8][0]},
-                            {'x': ['Associate degree'], 'y': [educational[0][1]], 'type': 'bar',
+                            {'x': ['Associate degree'], 'y': [(educational[0][1] / all_educational) * 100], 'type': 'bar',
                              'name': educational[0][0]},
-                            {'x': ["Bachelor's degree"], 'y': [educational[1][1]], 'type': 'bar',
+                            {'x': ["Bachelor's degree"], 'y': [(educational[1][1] / all_educational) * 100], 'type': 'bar',
                              'name': educational[1][0]},
-                            {'x': ['Master degree'], 'y': [educational[3][1]], 'type': 'bar',
+                            {'x': ['Master degree'], 'y': [(educational[3][1] / all_educational) * 100], 'type': 'bar',
                              'name': educational[3][0]},
-                            {'x': ['Professional degree'], 'y': [educational[6][1]], 'type': 'bar',
+                            {'x': ['Professional degree'], 'y': [(educational[6][1] / all_educational) * 100], 'type': 'bar',
                              'name': educational[6][0]},
-                            {'x': ['Doctoral degree'], 'y': [educational[4][1]], 'type': 'bar',
+                            {'x': ['Doctoral degree'], 'y': [(educational[4][1] / all_educational) * 100], 'type': 'bar',
                              'name': educational[4][0]},
                         ],
                         'layout': {
