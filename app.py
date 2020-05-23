@@ -179,6 +179,7 @@ app.layout = html.Div(style={
             id='category',
             options=[{'label': i, 'value': i} for i in category],
             value='Developer Roles',
+            style={'backgroundColor': '#777777', 'border': '2px solid #777777'}
         )
     ]),
 
