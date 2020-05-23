@@ -55,6 +55,11 @@ with server.app_context():
     undergrad_major = get_data(
         'SELECT UndergradMajor, COUNT(UndergradMajor) FROM data WHERE UndergradMajor != "NA" GROUP BY UndergradMajor')
     years_code = get_data('SELECT YearsCode, COUNT(YearsCode) FROM data WHERE YearsCode != "NA" GROUP BY YearsCode')
+    years_code_pro = get_data(
+        'SELECT YearsCodePro, COUNT(YearsCodePro) FROM data WHERE YearsCodePro != "NA" GROUP BY YearsCodePro')
+
+years_since_learning_code = []
+years_coding_professionally = []
 
 
 def add_years(start, end):
@@ -64,7 +69,13 @@ def add_years(start, end):
     years_since_learning_code.append(years)
 
 
-years_since_learning_code = []
+def add_years_pro(start, end):
+    years = 0
+    for i in range(start, end):
+        years += years_code_pro[i][1]
+    years_coding_professionally.append(years)
+
+
 less_then_10 = years_code[0][1] + years_code[11][1] + years_code[22][1] + years_code[33][1] + years_code[44][1] \
                + years_code[46][1] + years_code[47][1] + years_code[48][1] + years_code[49][1] + years_code[50][1]
 years_since_learning_code.append(less_then_10)
@@ -75,6 +86,18 @@ add_years(23, 33)
 add_years(34, 44)
 
 years_since_learning_code.append(years_code[45][1] + years_code[51][1])
+
+less_then_10_pro = years_code_pro[0][1] + years_code_pro[11][1] + years_code_pro[22][1] + years_code_pro[33][1] + \
+                   years_code_pro[44][1] + years_code_pro[46][1] + years_code_pro[47][1] + years_code_pro[48][1] \
+                   + years_code_pro[49][1] + years_code_pro[50][1]
+years_coding_professionally.append(less_then_10_pro)
+
+add_years_pro(1, 11)
+add_years_pro(12, 22)
+add_years_pro(23, 33)
+add_years_pro(34, 44)
+
+years_coding_professionally.append(years_code_pro[45][1] + years_code_pro[51][1])
 
 category = ['Developer Roles', 'Education', 'Experience']
 
@@ -278,6 +301,31 @@ def update_content(category_name):
                         ],
                         'layout': {
                             'title': 'Years Since Learning to Code'
+                        }
+                    }
+                ),
+            ]),
+
+            html.Div(children=[
+                dcc.Graph(
+                    id='years_coding_professionally',
+                    figure={
+                        'data': [
+                            {'x': ['Less then 10 years'], 'y': [years_coding_professionally[0]], 'type': 'bar',
+                             'name': 'Less then 10 years'},
+                            {'x': ['10 to 19 years'], 'y': [years_coding_professionally[1]], 'type': 'bar',
+                             'name': '10 to 19 years'},
+                            {'x': ['20 to 29 years'], 'y': [years_coding_professionally[2]], 'type': 'bar',
+                             'name': '20 to 29 years'},
+                            {'x': ['30 to 39 years'], 'y': [years_coding_professionally[3]], 'type': 'bar',
+                             'name': '30 to 39 years'},
+                            {'x': ['40 to 49 years'], 'y': [years_coding_professionally[4]], 'type': 'bar',
+                             'name': '40 to 49 years'},
+                            {'x': ['50 years or more'], 'y': [years_coding_professionally[5]], 'type': 'bar',
+                             'name': '50 years or more'},
+                        ],
+                        'layout': {
+                            'title': 'Years Coding Professionally'
                         }
                     }
                 ),
