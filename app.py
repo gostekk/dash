@@ -17,7 +17,12 @@ server.secret_key = os.environ.get('SECRET_KEY', 'secret123')
 app = dash.Dash(__name__, server=server)
 
 
-def get_db():
+def get_db() -> sqlite3.Connection:
+    """
+    Create connection to database and return it
+
+    :return: Database connection
+    """
     db = getattr(g, '_database', None)
     if db is None:
         db = g._database = sqlite3.connect(DATABASE)
@@ -25,13 +30,25 @@ def get_db():
 
 
 @server.teardown_appcontext
-def close_connection(exception):
+def close_connection(exception) -> None:
+    """
+    Close connections on server teardown
+
+    :param exception: Decorator param
+    :return: Nothing
+    """
     db = getattr(g, '_database', None)
     if db is not None:
         db.close()
 
 
-def get_data(query):
+def get_data(query: str) -> list:
+    """
+    Execute given query in database and return result
+
+    :param query: Sql query to database
+    :return: List with database data
+    """
     cur = get_db().cursor()
     cur.execute(query)
     rows = cur.fetchall()
@@ -62,17 +79,39 @@ years_since_learning_code = []
 years_coding_professionally = []
 
 
-def add_years(start, end):
+def add_years(start: int, end: int) -> None:
+    """
+
+    :param start: First year used in range
+    :param end: Last year ending range for
+    :return: Nothing
+    """
+    if start > end:
+        ValueError("Start year must be before end year.")
+
     years = 0
+
     for i in range(start, end):
         years += years_code[i][1]
+
     years_since_learning_code.append(years)
 
 
-def add_years_pro(start, end):
+def add_years_pro(start: int, end: int) -> None:
+    """
+
+    :param start: First year used in range
+    :param end: Last year ending range for
+    :return: Nothing
+    """
+    if start > end:
+        ValueError("Start year must be before end year.")
+
     years = 0
+
     for i in range(start, end):
         years += years_code_pro[i][1]
+
     years_coding_professionally.append(years)
 
 
@@ -333,7 +372,7 @@ def update_content(category_name):
         ]
 
 
-external_css = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
+external_css = ['http://cdn.muicss.com/mui-0.10.2/css/mui.min.css']
 
 for css in external_css:
     app.css.append_css({"external_url": css})
