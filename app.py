@@ -39,26 +39,67 @@ def get_data(query):
 
 
 with server.app_context():
-    have_hobbyist = get_data('SELECT * FROM data WHERE Hobbyist = "Yes"')
-    no_have_hobbyist = get_data('SELECT * FROM data WHERE Hobbyist = "No"')
+    hobbyist = get_data('SELECT Hobbyist, COUNT(Hobbyist) FROM data GROUP BY Hobbyist')
     never = get_data('SELECT * FROM data WHERE OpenSourcer = "Never"')
-    no_student = get_data('SELECT * FROM data WHERE Student = "No"')
-    full_time_student = get_data('SELECT * FROM data WHERE Student = "Yes, full-time"')
-    part_time_student = get_data('SELECT * FROM data WHERE Student = "Yes, part-time"')
-    lt_once_year = get_data('SELECT * FROM data WHERE OpenSourcer = "Less than once per year"')
-    lt_once_month_gt_once_year = get_data(
-        'SELECT * FROM data WHERE OpenSourcer = "Less than once a month but more than once per year"')
-    ge_once_month = get_data('SELECT * FROM data WHERE OpenSourcer = "Once a month or more often"')
+    open_source = get_data('SELECT OpenSourcer, COUNT(OpenSourcer) FROM data GROUP BY OpenSourcer')
+    student = get_data('SELECT Student, COUNT(Student) FROM data WHERE Student != "NA" GROUP BY Student')
     developer_full_stack = get_data('SELECT * FROM data WHERE DevType LIKE "%Developer, full-stack%"')
     developer_back_end = get_data('SELECT * FROM data WHERE DevType LIKE "%Developer, back-end%"')
     developer_front_end = get_data('SELECT * FROM data WHERE DevType LIKE "%Developer, front-end%"')
     developer_desktop = get_data(
-        'SELECT * FROM data WHERE DevType LIKE "%Developer, desktop or enterprise applications%"')
-    developer_mobile = get_data('SELECT * FROM data WHERE DevType LIKE "%Developer, mobile%"')
-    developer_test = get_data('SELECT * FROM data WHERE DevType LIKE "%Developer, QA or test%"')
-    developer_game_graphics = get_data('SELECT * FROM data WHERE DevType LIKE "%Developer, game or graphics%"')
+        'SELECT DevType FROM data WHERE DevType LIKE "%Developer, desktop or enterprise applications%"')
+    developer_mobile = get_data('SELECT DevType FROM data WHERE DevType LIKE "%Developer, mobile%"')
+    developer_test = get_data('SELECT DevType FROM data WHERE DevType LIKE "%Developer, QA or test%"')
+    developer_game_graphics = get_data('SELECT DevType FROM data WHERE DevType LIKE "%Developer, game or graphics%"')
+    educational = get_data('SELECT EDLevel, COUNT(EDlevel) FROM data WHERE EDLevel != "NA" GROUP BY EDLevel')
+    undergrad_major = get_data(
+        'SELECT UndergradMajor, COUNT(UndergradMajor) FROM data WHERE UndergradMajor != "NA" GROUP BY UndergradMajor')
+    years_code = get_data('SELECT YearsCode, COUNT(YearsCode) FROM data WHERE YearsCode != "NA" GROUP BY YearsCode')
+    years_code_pro = get_data(
+        'SELECT YearsCodePro, COUNT(YearsCodePro) FROM data WHERE YearsCodePro != "NA" GROUP BY YearsCodePro')
 
-category = ['Developer Roles', 'Education']
+years_since_learning_code = []
+years_coding_professionally = []
+
+
+def add_years(start, end):
+    years = 0
+    for i in range(start, end):
+        years += years_code[i][1]
+    years_since_learning_code.append(years)
+
+
+def add_years_pro(start, end):
+    years = 0
+    for i in range(start, end):
+        years += years_code_pro[i][1]
+    years_coding_professionally.append(years)
+
+
+less_then_10 = years_code[0][1] + years_code[11][1] + years_code[22][1] + years_code[33][1] + years_code[44][1] \
+               + years_code[46][1] + years_code[47][1] + years_code[48][1] + years_code[49][1] + years_code[50][1]
+years_since_learning_code.append(less_then_10)
+
+add_years(1, 11)
+add_years(12, 22)
+add_years(23, 33)
+add_years(34, 44)
+
+years_since_learning_code.append(years_code[45][1] + years_code[51][1])
+
+less_then_10_pro = years_code_pro[0][1] + years_code_pro[11][1] + years_code_pro[22][1] + years_code_pro[33][1] + \
+                   years_code_pro[44][1] + years_code_pro[46][1] + years_code_pro[47][1] + years_code_pro[48][1] \
+                   + years_code_pro[49][1] + years_code_pro[50][1]
+years_coding_professionally.append(less_then_10_pro)
+
+add_years_pro(1, 11)
+add_years_pro(12, 22)
+add_years_pro(23, 33)
+add_years_pro(34, 44)
+
+years_coding_professionally.append(years_code_pro[45][1] + years_code_pro[51][1])
+
+category = ['Developer Roles', 'Education', 'Experience']
 
 app.layout = html.Div(children=[
 
@@ -121,8 +162,8 @@ def update_content(category_name):
                     id='hobbyist',
                     figure={
                         'data': [
-                            {'x': ["Yes"], 'y': [len(have_hobbyist)], 'type': 'bar', 'name': 'Yes'},
-                            {'x': ["No"], 'y': [len(no_have_hobbyist)], 'type': 'bar', 'name': 'No'},
+                            {'x': [hobbyist[1][0]], 'y': [hobbyist[1][1]], 'type': 'bar', 'name': hobbyist[1][0]},
+                            {'x': [hobbyist[0][0]], 'y': [hobbyist[0][1]], 'type': 'bar', 'name': hobbyist[0][0]},
                         ],
                         'layout': {
                             'title': 'Coding as a Hobby'
@@ -136,16 +177,103 @@ def update_content(category_name):
                     id='open_sourcer',
                     figure={
                         'data': [
-                            {'x': ["Once a month or more often"], 'y': [len(ge_once_month)], 'type': 'bar',
-                             'name': 'Once a month or more often'},
-                            {'x': ["Less than once a month..."], 'y': [len(lt_once_month_gt_once_year)]
-                                , 'type': 'bar', 'name': 'Less than once a month but more than once per year'},
-                            {'x': ["Less than once per year"], 'y': [len(lt_once_year)], 'type': 'bar',
-                             'name': 'Less than once per year'},
-                            {'x': ["Never"], 'y': [len(never)], 'type': 'bar', 'name': 'Never'},
+                            {'x': [open_source[0][0]], 'y': [open_source[0][1]], 'type': 'bar',
+                             'name': open_source[0][0]},
+                            {'x': [open_source[1][0]], 'y': [open_source[1][1]]
+                                , 'type': 'bar', 'name': open_source[1][0]},
+                            {'x': [open_source[2][0]], 'y': [open_source[2][1]], 'type': 'bar',
+                             'name': open_source[2][0]},
+                            {'x': [open_source[3][0]], 'y': [open_source[3][1]], 'type': 'bar',
+                             'name': open_source[3][0]},
                         ],
                         'layout': {
                             'title': 'Contributing to Open Source'
+                        }
+                    }
+                ),
+            ]),
+        ]
+    elif category_name == 'Education':
+        return [
+            html.Div(children=[
+                dcc.Graph(
+                    id='student',
+                    figure={
+                        'data': [
+                            {'x': [student[0][0]], 'y': [student[0][1]], 'type': 'bar', 'name': student[0][0]},
+                            {'x': [student[1][0]], 'y': [student[1][1]], 'type': 'bar', 'name': student[1][0]},
+                            {'x': [student[2][0]], 'y': [student[2][1]], 'type': 'bar', 'name': student[2][0]},
+                        ],
+                        'layout': {
+                            'title': 'How Many Developers are Students?'
+                        }
+                    }
+                ),
+            ]),
+
+            html.Div(children=[
+                dcc.Graph(
+                    id='educational_attainment',
+                    figure={
+                        'data': [
+                            {'x': ['Any formal education'], 'y': [educational[2][1]], 'type': 'bar',
+                             'name': educational[2][0]},
+                            {'x': ['Primary school'], 'y': [educational[5][1]], 'type': 'bar',
+                             'name': educational[5][0]},
+                            {'x': ['Secondary school'], 'y': [educational[7][1]], 'type': 'bar',
+                             'name': educational[7][0]},
+                            {'x': ['Some college'], 'y': [educational[8][1]], 'type': 'bar',
+                             'name': educational[8][0]},
+                            {'x': ['Associate degree'], 'y': [educational[0][1]], 'type': 'bar',
+                             'name': educational[0][0]},
+                            {'x': ["Bachelor's degree"], 'y': [educational[1][1]], 'type': 'bar',
+                             'name': educational[1][0]},
+                            {'x': ['Master degree'], 'y': [educational[3][1]], 'type': 'bar',
+                             'name': educational[3][0]},
+                            {'x': ['Professional degree'], 'y': [educational[6][1]], 'type': 'bar',
+                             'name': educational[6][0]},
+                            {'x': ['Doctoral degree'], 'y': [educational[4][1]], 'type': 'bar',
+                             'name': educational[4][0]},
+                        ],
+                        'layout': {
+                            'title': 'Educational Attainment'
+                        }
+                    }
+                ),
+            ]),
+
+            html.Div(children=[
+                dcc.Graph(
+                    id='undergraduate_major',
+                    figure={
+                        'data': [
+                            {'x': ['Computer science...'], 'y': [undergrad_major[6][1]], 'type': 'bar',
+                             'name': undergrad_major[6][0]},
+                            {'x': ['Another engineering...'], 'y': [undergrad_major[5][1]], 'type': 'bar',
+                             'name': undergrad_major[5][0]},
+                            {'x': ['Information systems...'], 'y': [undergrad_major[9][1]], 'type': 'bar',
+                             'name': undergrad_major[9][0]},
+                            {'x': ['Web development...'], 'y': [undergrad_major[11][1]], 'type': 'bar',
+                             'name': undergrad_major[11][0]},
+                            {'x': ['Natural science'], 'y': [undergrad_major[3][1]], 'type': 'bar',
+                             'name': undergrad_major[3][0]},
+                            {'x': ['Mathematics...'], 'y': [undergrad_major[10][1]], 'type': 'bar',
+                             'name': undergrad_major[10][0]},
+                            {'x': ['Business discipline'], 'y': [undergrad_major[0][1]], 'type': 'bar',
+                             'name': undergrad_major[0][0]},
+                            {'x': ['Humanities discipline'], 'y': [undergrad_major[2][1]], 'type': 'bar',
+                             'name': undergrad_major[2][0]},
+                            {'x': ['Social science'], 'y': [undergrad_major[4][1]], 'type': 'bar',
+                             'name': undergrad_major[4][0]},
+                            {'x': ['Fine arts...'], 'y': [undergrad_major[7][1]], 'type': 'bar',
+                             'name': undergrad_major[7][0]},
+                            {'x': ['Any declared a major'], 'y': [undergrad_major[8][1]], 'type': 'bar',
+                             'name': undergrad_major[8][0]},
+                            {'x': ['Health science'], 'y': [undergrad_major[1][1]], 'type': 'bar',
+                             'name': undergrad_major[1][0]},
+                        ],
+                        'layout': {
+                            'title': 'Undergraduate Major'
                         }
                     }
                 ),
@@ -155,17 +283,49 @@ def update_content(category_name):
         return [
             html.Div(children=[
                 dcc.Graph(
-                    id='student',
+                    id='years_since_learning_to_code',
                     figure={
                         'data': [
-                            {'x': ["No"], 'y': [len(no_student)], 'type': 'bar', 'name': 'No'},
-                            {'x': ["Yes, full-time"], 'y': [len(full_time_student)], 'type': 'bar',
-                             'name': 'Yes, full-time'},
-                            {'x': ["Yes, part-time"], 'y': [len(lt_once_year)], 'type': 'bar',
-                             'name': 'Yes, part-time'},
+                            {'x': ['Less then 10 years'], 'y': [years_since_learning_code[0]], 'type': 'bar',
+                             'name': 'Less then 10 years'},
+                            {'x': ['10 to 19 years'], 'y': [years_since_learning_code[1]], 'type': 'bar',
+                             'name': '10 to 19 years'},
+                            {'x': ['20 to 29 years'], 'y': [years_since_learning_code[2]], 'type': 'bar',
+                             'name': '20 to 29 years'},
+                            {'x': ['30 to 39 years'], 'y': [years_since_learning_code[3]], 'type': 'bar',
+                             'name': '30 to 39 years'},
+                            {'x': ['40 to 49 years'], 'y': [years_since_learning_code[4]], 'type': 'bar',
+                             'name': '40 to 49 years'},
+                            {'x': ['50 years or more'], 'y': [years_since_learning_code[5]], 'type': 'bar',
+                             'name': '50 years or more'},
                         ],
                         'layout': {
-                            'title': 'How Many Developers are Students?'
+                            'title': 'Years Since Learning to Code'
+                        }
+                    }
+                ),
+            ]),
+
+            html.Div(children=[
+                dcc.Graph(
+                    id='years_coding_professionally',
+                    figure={
+                        'data': [
+                            {'x': ['Less then 10 years'], 'y': [years_coding_professionally[0]], 'type': 'bar',
+                             'name': 'Less then 10 years'},
+                            {'x': ['10 to 19 years'], 'y': [years_coding_professionally[1]], 'type': 'bar',
+                             'name': '10 to 19 years'},
+                            {'x': ['20 to 29 years'], 'y': [years_coding_professionally[2]], 'type': 'bar',
+                             'name': '20 to 29 years'},
+                            {'x': ['30 to 39 years'], 'y': [years_coding_professionally[3]], 'type': 'bar',
+                             'name': '30 to 39 years'},
+                            {'x': ['40 to 49 years'], 'y': [years_coding_professionally[4]], 'type': 'bar',
+                             'name': '40 to 49 years'},
+                            {'x': ['50 years or more'], 'y': [years_coding_professionally[5]], 'type': 'bar',
+                             'name': '50 years or more'},
+                        ],
+                        'layout': {
+                            'title': 'Years Coding Professionally'
                         }
                     }
                 ),
