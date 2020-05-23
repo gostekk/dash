@@ -1,15 +1,41 @@
-version: '3'
+version: '3.7'
 
 services:
-  dash:
-    container_name: dash
+  dash_db:
+    container_name: "dash_db"
+    image: "postgres:12-alpine"
+    restart: unless-stopped
+    volumes:
+      - dash_db:/var/lib/postgresql
+    environment:
+      - POSTGRES_USER=dashuser
+      - POSTGRES_PASSWORD=dashpassword
+      - POSTGRES_DB=dash
+    networks:
+      - dash_network
+
+  dash_app:
+    container_name: "dash_app"
     build:
       context: .
       dockerfile: Dockerfile
+    restart: unless-stopped
+    env_file:
+      - example.env
     environment:
-      - DEBUG=True
-      - HOST=0.0.0.0
-      - PORT=8000
-      - SECRET_KEY=abcdfghijklmnoopprst
+      - DB_TYPE=el
     ports:
       - 8000:8000
+    depends_on:
+      - dash_db
+    networks:
+      - dash_network
+
+# volumes definiton
+volumes:
+  dash_db:
+
+# network definition
+networks:
+  dash_network:
+    driver: bridge
