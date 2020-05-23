@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import os
 import sqlite3
+import psycopg2
 from ast import literal_eval
 
 import dash
@@ -25,7 +26,12 @@ def get_db():
     db = getattr(g, '_database', None)
     if db is None:
         if os.environ.get('DB_TYPE') == 'postgres':
-            print('postgres')
+            db = g._database = psycopg2.connect(
+                host=os.environ.get('DB_HOST'),
+                database=os.environ.get('DB_DATABASE'),
+                user=os.environ.get('DB_USER'),
+                password=os.environ.get('DB_PASSWORD')
+            )
         else:
             db = g._database = sqlite3.connect(os.environ.get('DB_PATH', './db.sqlite3'))
     return db
@@ -54,6 +60,7 @@ def get_data(query: str) -> list:
     cur = get_db().cursor()
     cur.execute(query)
     rows = cur.fetchall()
+    cur.close()
     return rows
 
 
