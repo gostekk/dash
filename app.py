@@ -54,8 +54,29 @@ with server.app_context():
     educational = get_data('SELECT EDLevel, COUNT(EDlevel) FROM data WHERE EDLevel != "NA" GROUP BY EDLevel')
     undergrad_major = get_data(
         'SELECT UndergradMajor, COUNT(UndergradMajor) FROM data WHERE UndergradMajor != "NA" GROUP BY UndergradMajor')
+    years_code = get_data('SELECT YearsCode, COUNT(YearsCode) FROM data WHERE YearsCode != "NA" GROUP BY YearsCode')
 
-category = ['Developer Roles', 'Education']
+
+def add_years(start, end):
+    years = 0
+    for i in range(start, end):
+        years += years_code[i][1]
+    years_since_learning_code.append(years)
+
+
+years_since_learning_code = []
+less_then_10 = years_code[0][1] + years_code[11][1] + years_code[22][1] + years_code[33][1] + years_code[44][1] \
+               + years_code[46][1] + years_code[47][1] + years_code[48][1] + years_code[49][1] + years_code[50][1]
+years_since_learning_code.append(less_then_10)
+
+add_years(1, 11)
+add_years(12, 22)
+add_years(23, 33)
+add_years(34, 44)
+
+years_since_learning_code.append(years_code[45][1] + years_code[51][1])
+
+category = ['Developer Roles', 'Education', 'Experience']
 
 app.layout = html.Div(children=[
 
@@ -149,7 +170,7 @@ def update_content(category_name):
                 ),
             ]),
         ]
-    else:
+    elif category_name == 'Education':
         return [
             html.Div(children=[
                 dcc.Graph(
@@ -230,6 +251,33 @@ def update_content(category_name):
                         ],
                         'layout': {
                             'title': 'Undergraduate Major'
+                        }
+                    }
+                ),
+            ]),
+        ]
+    else:
+        return [
+            html.Div(children=[
+                dcc.Graph(
+                    id='years_since_learning_to_code',
+                    figure={
+                        'data': [
+                            {'x': ['Less then 10 years'], 'y': [years_since_learning_code[0]], 'type': 'bar',
+                             'name': 'Less then 10 years'},
+                            {'x': ['10 to 19 years'], 'y': [years_since_learning_code[1]], 'type': 'bar',
+                             'name': '10 to 19 years'},
+                            {'x': ['20 to 29 years'], 'y': [years_since_learning_code[2]], 'type': 'bar',
+                             'name': '20 to 29 years'},
+                            {'x': ['30 to 39 years'], 'y': [years_since_learning_code[3]], 'type': 'bar',
+                             'name': '30 to 39 years'},
+                            {'x': ['40 to 49 years'], 'y': [years_since_learning_code[4]], 'type': 'bar',
+                             'name': '40 to 49 years'},
+                            {'x': ['50 years or more'], 'y': [years_since_learning_code[5]], 'type': 'bar',
+                             'name': '50 years or more'},
+                        ],
+                        'layout': {
+                            'title': 'Years Since Learning to Code'
                         }
                     }
                 ),
