@@ -9,7 +9,6 @@ import dash_html_components as html
 from dash.dependencies import Input, Output
 from flask import Flask, g
 
-DATABASE = './db.sqlite3'
 
 server = Flask('Dash')
 server.secret_key = os.environ.get('SECRET_KEY', 'secret123')
@@ -17,7 +16,7 @@ server.secret_key = os.environ.get('SECRET_KEY', 'secret123')
 app = dash.Dash(__name__, server=server)
 
 
-def get_db() -> sqlite3.Connection:
+def get_db():
     """
     Create connection to database and return it
 
@@ -25,7 +24,10 @@ def get_db() -> sqlite3.Connection:
     """
     db = getattr(g, '_database', None)
     if db is None:
-        db = g._database = sqlite3.connect(DATABASE)
+        if os.environ.get('DB_TYPE') == 'postgres':
+            print('postgres')
+        else:
+            db = g._database = sqlite3.connect(os.environ.get('DB_PATH', './db.sqlite3'))
     return db
 
 
