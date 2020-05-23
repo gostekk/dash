@@ -7,6 +7,7 @@ import dash
 import dash_core_components as dcc
 import dash_html_components as html
 from dash.dependencies import Input, Output
+import dash_bootstrap_components as dbc
 from flask import Flask, g
 
 DATABASE = './db.sqlite3'
@@ -14,7 +15,7 @@ DATABASE = './db.sqlite3'
 server = Flask('Dash')
 server.secret_key = os.environ.get('SECRET_KEY', 'secret123')
 
-app = dash.Dash(__name__, server=server)
+app = dash.Dash(__name__, server=server, external_stylesheets=[dbc.themes.BOOTSTRAP])
 
 
 def get_db() -> sqlite3.Connection:
@@ -151,10 +152,22 @@ years_coding_professionally.append(years_code_pro[45][1] + years_code_pro[51][1]
 
 category = ['Developer Roles', 'Education', 'Experience']
 
-app.layout = html.Div(children=[
+colors = {
+    'background': '#000000',
+    'two_background': '#222222',
+    'nav_color': '#DDDDDD',
+    'text_color': '#FFFFFF',
+}
+
+app.layout = html.Div(style={
+    'backgroundColor': colors['background']
+}, children=[
 
     html.Div(style={
         'textAlign': 'center',
+        'padding': '1px',
+        'backgroundColor': colors['two_background'],
+        'color': colors['nav_color'],
     }, children=[
         html.H2(
             children='Developer Profile',
@@ -165,7 +178,7 @@ app.layout = html.Div(children=[
         dcc.Dropdown(
             id='category',
             options=[{'label': i, 'value': i} for i in category],
-            value='Developer Roles'
+            value='Developer Roles',
         )
     ]),
 
@@ -180,193 +193,305 @@ app.layout = html.Div(children=[
 def update_content(category_name):
     if category_name == 'Developer Roles':
         return [
-            html.Div(children=[
-                dcc.Graph(
-                    id='developer_type',
-                    figure={
-                        'data': [
-                            {'x': ["Full-stack"], 'y': [(len(developer_full_stack) / all_developers) * 100],
-                             'type': 'bar', 'name': 'Developer, full-stack'},
-                            {'x': ["Back-end"], 'y': [(len(developer_back_end) / all_developers) * 100], 'type': 'bar',
-                             'name': 'Developer, back-end'},
-                            {'x': ["Front-end"], 'y': [(len(developer_front_end) / all_developers) * 100], 'type': 'bar',
-                             'name': 'Developer, front-end'},
-                            {'x': ["Desktop or enterprise applications"],
-                             'y': [(len(developer_desktop) / all_developers) * 100], 'type': 'bar',
-                             'name': 'Developer, desktop or enterprise applications'},
-                            {'x': ["Mobile"], 'y': [(len(developer_mobile) / all_developers) * 100], 'type': 'bar',
-                             'name': 'Developer, mobile'},
-                            {'x': ["QA or test"], 'y': [(len(developer_test) / all_developers * 100)], 'type': 'bar',
-                             'name': 'Developer, QA or test'},
-                            {'x': ["Game or graphics"], 'y': [(len(developer_game_graphics) / all_developers) * 100],
-                             'type': 'bar', 'name': 'Developer, game or graphics'},
-                        ],
-                        'layout': {
-                            'title': 'Developer Type'
-                        }
-                    }
+            dbc.Card(
+                dbc.CardBody(
+                    [
+                        html.Div(children=[
+                            dcc.Graph(
+                                id='developer_type',
+                                figure={
+                                    'data': [
+                                        {'x': ["Full-stack"], 'y': [(len(developer_full_stack) / all_developers) * 100],
+                                         'type': 'bar', 'name': 'Developer, full-stack'},
+                                        {'x': ["Back-end"], 'y': [(len(developer_back_end) / all_developers) * 100],
+                                         'type': 'bar',
+                                         'name': 'Developer, back-end'},
+                                        {'x': ["Front-end"], 'y': [(len(developer_front_end) / all_developers) * 100],
+                                         'type': 'bar', 'name': 'Developer, front-end'},
+                                        {'x': ["Desktop or enterprise applications"],
+                                         'y': [(len(developer_desktop) / all_developers) * 100], 'type': 'bar',
+                                         'name': 'Developer, desktop or enterprise applications'},
+                                        {'x': ["Mobile"], 'y': [(len(developer_mobile) / all_developers) * 100],
+                                         'type': 'bar',
+                                         'name': 'Developer, mobile'},
+                                        {'x': ["QA or test"], 'y': [(len(developer_test) / all_developers * 100)],
+                                         'type': 'bar',
+                                         'name': 'Developer, QA or test'},
+                                        {'x': ["Game or graphics"],
+                                         'y': [(len(developer_game_graphics) / all_developers) * 100],
+                                         'type': 'bar', 'name': 'Developer, game or graphics'},
+                                    ],
+                                    'layout': {
+                                        'title': 'Developer Type',
+                                        'plot_bgcolor': colors['two_background'],
+                                        'paper_bgcolor': colors['two_background'],
+                                        'font': {
+                                            'color': colors['text_color']
+                                        }
+                                    }
+                                }
+                            ),
+                        ]),
+                    ]
                 ),
-            ]),
+                style={'backgroundColor': colors['background']}
+            ),
 
-            html.Div(children=[
-                dcc.Graph(
-                    id='hobbyist',
-                    figure={
-                        'data': [
-                            {
-                                'values': [hobbyist[1][1], hobbyist[0][1]],
-                                'type': 'pie',
-                                'labels': [hobbyist[1][0], hobbyist[0][0]],
-                            },
-                        ],
-                        'layout': {
-                            'title': 'Coding as a Hobby'
-                        }
-                    }
+            dbc.Card(
+                dbc.CardBody(
+                    [
+                        html.Div(children=[
+                            dcc.Graph(
+                                id='hobbyist',
+                                figure={
+                                    'data': [
+                                        {
+                                            'values': [hobbyist[1][1], hobbyist[0][1]],
+                                            'type': 'pie',
+                                            'labels': [hobbyist[1][0], hobbyist[0][0]],
+                                        },
+                                    ],
+                                    'layout': {
+                                        'title': 'Coding as a Hobby',
+                                        'plot_bgcolor': colors['two_background'],
+                                        'paper_bgcolor': colors['two_background'],
+                                        'font': {
+                                            'color': colors['text_color']
+                                        }
+                                    }
+                                }
+                            ),
+                        ]),
+                    ]
                 ),
-            ]),
+                style={'backgroundColor': colors['background']}
+            ),
 
-            html.Div(children=[
-                dcc.Graph(
-                    id='open_sourcer',
-                    figure={
-                        'data': [
-                            {'x': [open_source[0][0]], 'y': [(open_source[0][1] / all_open_source) * 100], 'type': 'bar',
-                             'name': open_source[0][0]},
-                            {'x': [open_source[1][0]], 'y': [(open_source[1][1] / all_open_source) * 100]
-                                , 'type': 'bar', 'name': open_source[1][0]},
-                            {'x': [open_source[2][0]], 'y': [(open_source[2][1] / all_open_source * 100)], 'type': 'bar',
-                             'name': open_source[2][0]},
-                            {'x': [open_source[3][0]], 'y': [(open_source[3][1] / all_open_source * 100)], 'type': 'bar',
-                             'name': open_source[3][0]},
-                        ],
-                        'layout': {
-                            'title': 'Contributing to Open Source'
-                        }
-                    }
+            dbc.Card(
+                dbc.CardBody(
+                    [
+                        html.Div(children=[
+                            dcc.Graph(
+                                id='open_sourcer',
+                                figure={
+                                    'data': [
+                                        {'x': [open_source[0][0]], 'y': [(open_source[0][1] / all_open_source) * 100],
+                                         'type': 'bar', 'name': open_source[0][0]},
+                                        {'x': [open_source[1][0]], 'y': [(open_source[1][1] / all_open_source) * 100],
+                                         'type': 'bar', 'name': open_source[1][0]},
+                                        {'x': [open_source[2][0]], 'y': [(open_source[2][1] / all_open_source * 100)],
+                                         'type': 'bar', 'name': open_source[2][0]},
+                                        {'x': [open_source[3][0]], 'y': [(open_source[3][1] / all_open_source * 100)],
+                                         'type': 'bar', 'name': open_source[3][0]},
+                                    ],
+                                    'layout': {
+                                        'title': 'Contributing to Open Source',
+                                        'plot_bgcolor': colors['two_background'],
+                                        'paper_bgcolor': colors['two_background'],
+                                        'font': {
+                                            'color': colors['text_color']
+                                        }
+                                    }
+                                }
+                            ),
+                        ]),
+                    ]
                 ),
-            ]),
+                style={'backgroundColor': colors['background']}
+            )
         ]
     elif category_name == 'Education':
         return [
-            html.Div(children=[
-                dcc.Graph(
-                    id='student',
-                    figure={
-                        'data': [
-                            {
-                                'values': [student[0][1], student[1][1], open_source[2][1]],
-                                'type': 'pie',
-                                'labels': [student[0][0], student[1][0], student[2][0]],
-                            },
-                        ],
-                        'layout': {
-                            'title': 'How Many Developers are Students?'
-                        }
-                    }
+            dbc.Card(
+                dbc.CardBody(
+                    [
+                        html.Div(children=[
+                            dcc.Graph(
+                                id='student',
+                                figure={
+                                    'data': [
+                                        {
+                                            'values': [student[0][1], student[1][1], open_source[2][1]],
+                                            'type': 'pie',
+                                            'labels': [student[0][0], student[1][0], student[2][0]],
+                                        },
+                                    ],
+                                    'layout': {
+                                        'title': 'How Many Developers are Students?',
+                                        'plot_bgcolor': colors['two_background'],
+                                        'paper_bgcolor': colors['two_background'],
+                                        'font': {
+                                            'color': colors['text_color']
+                                        }
+                                    }
+                                }
+                            ),
+                        ]),
+                    ]
                 ),
-            ]),
+                style={'backgroundColor': colors['background']}
+            ),
 
-            html.Div(children=[
-                dcc.Graph(
-                    id='educational_attainment',
-                    figure={
-                        'data': [
-                            {'x': ['Any formal education'], 'y': [(educational[2][1] / all_educational) * 100], 'type': 'bar',
-                             'name': educational[2][0]},
-                            {'x': ['Primary school'], 'y': [(educational[5][1] / all_educational) * 100], 'type': 'bar',
-                             'name': educational[5][0]},
-                            {'x': ['Secondary school'], 'y': [(educational[7][1] / all_educational) * 100], 'type': 'bar',
-                             'name': educational[7][0]},
-                            {'x': ['Some college'], 'y': [(educational[8][1] / all_educational) * 100], 'type': 'bar',
-                             'name': educational[8][0]},
-                            {'x': ['Associate degree'], 'y': [(educational[0][1] / all_educational) * 100], 'type': 'bar',
-                             'name': educational[0][0]},
-                            {'x': ["Bachelor's degree"], 'y': [(educational[1][1] / all_educational) * 100], 'type': 'bar',
-                             'name': educational[1][0]},
-                            {'x': ['Master degree'], 'y': [(educational[3][1] / all_educational) * 100], 'type': 'bar',
-                             'name': educational[3][0]},
-                            {'x': ['Professional degree'], 'y': [(educational[6][1] / all_educational) * 100], 'type': 'bar',
-                             'name': educational[6][0]},
-                            {'x': ['Doctoral degree'], 'y': [(educational[4][1] / all_educational) * 100], 'type': 'bar',
-                             'name': educational[4][0]},
-                        ],
-                        'layout': {
-                            'title': 'Educational Attainment'
-                        }
-                    }
+            dbc.Card(
+                dbc.CardBody(
+                    [
+                        html.Div(children=[
+                            dcc.Graph(
+                                id='educational_attainment',
+                                figure={
+                                    'data': [
+                                        {'x': ['Any formal education'],
+                                         'y': [(educational[2][1] / all_educational) * 100],
+                                         'type': 'bar', 'name': educational[2][0]},
+                                        {'x': ['Primary school'], 'y': [(educational[5][1] / all_educational) * 100],
+                                         'type': 'bar', 'name': educational[5][0]},
+                                        {'x': ['Secondary school'], 'y': [(educational[7][1] / all_educational) * 100],
+                                         'type': 'bar', 'name': educational[7][0]},
+                                        {'x': ['Some college'], 'y': [(educational[8][1] / all_educational) * 100],
+                                         'type': 'bar', 'name': educational[8][0]},
+                                        {'x': ['Associate degree'], 'y': [(educational[0][1] / all_educational) * 100],
+                                         'type': 'bar', 'name': educational[0][0]},
+                                        {'x': ["Bachelor's degree"], 'y': [(educational[1][1] / all_educational) * 100],
+                                         'type': 'bar', 'name': educational[1][0]},
+                                        {'x': ['Master degree'], 'y': [(educational[3][1] / all_educational) * 100],
+                                         'type': 'bar', 'name': educational[3][0]},
+                                        {'x': ['Professional degree'],
+                                         'y': [(educational[6][1] / all_educational) * 100],
+                                         'type': 'bar', 'name': educational[6][0]},
+                                        {'x': ['Doctoral degree'], 'y': [(educational[4][1] / all_educational) * 100],
+                                         'type': 'bar', 'name': educational[4][0]},
+                                    ],
+                                    'layout': {
+                                        'title': 'Educational Attainment',
+                                        'plot_bgcolor': colors['two_background'],
+                                        'paper_bgcolor': colors['two_background'],
+                                        'font': {
+                                            'color': colors['text_color']
+                                        }
+                                    }
+                                }
+                            ),
+                        ]),
+                    ]
                 ),
-            ]),
+                style={'backgroundColor': colors['background']}
+            ),
 
-            html.Div(children=[
-                dcc.Graph(
-                    id='undergraduate_major',
-                    figure={
-                        'data': [
-                            {
-                                'values': [undergrad_major[6][1], undergrad_major[5][1], undergrad_major[9][1],
-                                           undergrad_major[11][1], undergrad_major[3][1], undergrad_major[10][1],
-                                           undergrad_major[10][1], undergrad_major[0][1], undergrad_major[2][1],
-                                           undergrad_major[4][1], undergrad_major[7][1], undergrad_major[8][1],
-                                           undergrad_major[1][1]],
-                                'type': 'pie',
-                                'labels': [undergrad_major[6][0], undergrad_major[5][0], undergrad_major[9][0],
-                                           undergrad_major[11][0], undergrad_major[3][0], undergrad_major[10][0],
-                                           undergrad_major[10][0], undergrad_major[0][0], undergrad_major[2][0],
-                                           undergrad_major[4][0], undergrad_major[7][0], undergrad_major[8][0],
-                                           undergrad_major[1][0]],
-                            },
-                        ],
-                        'layout': {
-                            'title': 'Undergraduate Major'
-                        }
-                    }
+            dbc.Card(
+                dbc.CardBody(
+                    [
+                        html.Div(children=[
+                            dcc.Graph(
+                                id='undergraduate_major',
+                                figure={
+                                    'data': [
+                                        {
+                                            'values': [undergrad_major[6][1], undergrad_major[5][1],
+                                                       undergrad_major[9][1],
+                                                       undergrad_major[11][1], undergrad_major[3][1],
+                                                       undergrad_major[10][1],
+                                                       undergrad_major[10][1], undergrad_major[0][1],
+                                                       undergrad_major[2][1],
+                                                       undergrad_major[4][1], undergrad_major[7][1],
+                                                       undergrad_major[8][1],
+                                                       undergrad_major[1][1]],
+                                            'type': 'pie',
+                                            'labels': [undergrad_major[6][0], undergrad_major[5][0],
+                                                       undergrad_major[9][0],
+                                                       undergrad_major[11][0], undergrad_major[3][0],
+                                                       undergrad_major[10][0],
+                                                       undergrad_major[10][0], undergrad_major[0][0],
+                                                       undergrad_major[2][0],
+                                                       undergrad_major[4][0], undergrad_major[7][0],
+                                                       undergrad_major[8][0],
+                                                       undergrad_major[1][0]],
+                                        },
+                                    ],
+                                    'layout': {
+                                        'title': 'Undergraduate Major',
+                                        'plot_bgcolor': colors['two_background'],
+                                        'paper_bgcolor': colors['two_background'],
+                                        'font': {
+                                            'color': colors['text_color']
+                                        }
+                                    }
+                                }
+                            ),
+                        ]),
+                    ]
                 ),
-            ]),
+                style={'backgroundColor': colors['background']}
+            ),
         ]
     else:
         return [
-            html.Div(children=[
-                dcc.Graph(
-                    id='years_since_learning_to_code',
-                    figure={
-                        'data': [
-                            {
-                                'values': [years_since_learning_code[0], years_since_learning_code[1],
-                                           years_since_learning_code[2], years_since_learning_code[3],
-                                           years_since_learning_code[4], years_since_learning_code[5]],
-                                'type': 'pie',
-                                'labels': ['Less then 10 years', '10 to 19 years', '20 to 29 years', '30 to 39 years',
-                                           '40 to 49 years', '50 years or more'],
-                            },
-                        ],
-                        'layout': {
-                            'title': 'Years Since Learning to Code'
-                        }
-                    }
+            dbc.Card(
+                dbc.CardBody(
+                    [
+                        html.Div(children=[
+                            dcc.Graph(
+                                id='years_since_learning_to_code',
+                                figure={
+                                    'data': [
+                                        {
+                                            'values': [years_since_learning_code[0], years_since_learning_code[1],
+                                                       years_since_learning_code[2], years_since_learning_code[3],
+                                                       years_since_learning_code[4], years_since_learning_code[5]],
+                                            'type': 'pie',
+                                            'labels': ['Less then 10 years', '10 to 19 years', '20 to 29 years',
+                                                       '30 to 39 years',
+                                                       '40 to 49 years', '50 years or more'],
+                                        },
+                                    ],
+                                    'layout': {
+                                        'title': 'Years Since Learning to Code',
+                                        'plot_bgcolor': colors['two_background'],
+                                        'paper_bgcolor': colors['two_background'],
+                                        'font': {
+                                            'color': colors['text_color']
+                                        }
+                                    }
+                                }
+                            ),
+                        ]),
+                    ]
                 ),
-            ]),
+                style={'backgroundColor': colors['background']}
+            ),
 
-            html.Div(children=[
-                dcc.Graph(
-                    id='years_coding_professionally',
-                    figure={
-                        'data': [
-                            {
-                                'values': [years_coding_professionally[0], years_coding_professionally[1],
-                                           years_coding_professionally[2], years_coding_professionally[3],
-                                           years_coding_professionally[4], years_coding_professionally[5]],
-                                'type': 'pie',
-                                'labels': ['Less then 10 years', '10 to 19 years', '20 to 29 years', '30 to 39 years',
-                                           '40 to 49 years', '50 years or more'],
-                            },
-                        ],
-                        'layout': {
-                            'title': 'Years Coding Professionally'
-                        }
-                    }
+            dbc.Card(
+                dbc.CardBody(
+                    [
+                        html.Div(children=[
+                            dcc.Graph(
+                                id='years_coding_professionally',
+                                figure={
+                                    'data': [
+                                        {
+                                            'values': [years_coding_professionally[0], years_coding_professionally[1],
+                                                       years_coding_professionally[2], years_coding_professionally[3],
+                                                       years_coding_professionally[4], years_coding_professionally[5]],
+                                            'type': 'pie',
+                                            'labels': ['Less then 10 years', '10 to 19 years', '20 to 29 years',
+                                                       '30 to 39 years',
+                                                       '40 to 49 years', '50 years or more'],
+                                        },
+                                    ],
+                                    'layout': {
+                                        'title': 'Years Coding Professionally',
+                                        'plot_bgcolor': colors['two_background'],
+                                        'paper_bgcolor': colors['two_background'],
+                                        'font': {
+                                            'color': colors['text_color']
+                                        }
+                                    }
+                                }
+                            ),
+                        ]),
+                    ]
                 ),
-            ]),
+                style={'backgroundColor': colors['background']}
+            )
         ]
 
 
