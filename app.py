@@ -15,7 +15,7 @@ DATABASE = './db.sqlite3'
 server = Flask('Dash')
 server.secret_key = os.environ.get('SECRET_KEY', 'secret123')
 
-app = dash.Dash(__name__, server=server, external_stylesheets=[dbc.themes.BOOTSTRAP])
+app = dash.Dash(__name__, server=server, external_stylesheets=[dbc.themes.DARKLY])
 
 
 def get_db() -> sqlite3.Connection:
@@ -150,37 +150,28 @@ add_years_pro(34, 44)
 
 years_coding_professionally.append(years_code_pro[45][1] + years_code_pro[51][1])
 
-category = ['Developer Roles', 'Education', 'Experience']
+categories = [
+    dbc.DropdownMenuItem('Developer Roles', id='developer_roles'),
+    dbc.DropdownMenuItem('Education', id='education'),
+    dbc.DropdownMenuItem('Experience', id='experience')
+]
 
 colors = {
-    'background': '#000000',
-    'two_background': '#222222',
-    'nav_color': '#DDDDDD',
+    'first_background': '#000000',
+    'second_background': '#212121',
     'text_color': '#FFFFFF',
 }
 
-app.layout = html.Div(style={
-    'backgroundColor': colors['background']
-}, children=[
+app.layout = html.Div(children=[
 
-    html.Div(style={
-        'textAlign': 'center',
-        'padding': '1px',
-        'backgroundColor': colors['two_background'],
-        'color': colors['nav_color'],
-    }, children=[
-        html.H2(
-            children='Developer Profile',
+    html.Div(children=[
+        dbc.NavbarSimple(children=[
+            dbc.DropdownMenu(categories, label='Categories', color='secondary')
+        ],
+            brand='Developer Profile',
+            color='dark',
+            dark='True',
         ),
-    ]),
-
-    html.Div([
-        dcc.Dropdown(
-            id='category',
-            options=[{'label': i, 'value': i} for i in category],
-            value='Developer Roles',
-            style={'backgroundColor': '#777777', 'border': '2px solid #777777'}
-        )
     ]),
 
     html.Div(id='content')
@@ -189,10 +180,19 @@ app.layout = html.Div(style={
 
 @app.callback(
     Output('content', 'children'),
-    [Input('category', 'value')]
+    [
+        Input('developer_roles', 'n_clicks'),
+        Input('education', 'n_clicks'),
+        Input('experience', 'n_clicks')
+    ]
 )
-def update_content(category_name):
-    if category_name == 'Developer Roles':
+def update_content(*args):
+    ctx = dash.callback_context
+    if not ctx.triggered:
+        category_name = 'developer_roles'
+    else:
+        category_name = ctx.triggered[0]['prop_id'].split('.')[0]
+    if category_name == 'developer_roles':
         return [
             dbc.Card(
                 dbc.CardBody(
@@ -224,8 +224,8 @@ def update_content(category_name):
                                     ],
                                     'layout': {
                                         'title': 'Developer Type',
-                                        'plot_bgcolor': colors['two_background'],
-                                        'paper_bgcolor': colors['two_background'],
+                                        'plot_bgcolor': colors['second_background'],
+                                        'paper_bgcolor': colors['second_background'],
                                         'font': {
                                             'color': colors['text_color']
                                         }
@@ -235,7 +235,7 @@ def update_content(category_name):
                         ]),
                     ]
                 ),
-                style={'backgroundColor': colors['background']}
+                style={'backgroundColor': colors['first_background']}
             ),
 
             dbc.Card(
@@ -254,8 +254,8 @@ def update_content(category_name):
                                     ],
                                     'layout': {
                                         'title': 'Coding as a Hobby',
-                                        'plot_bgcolor': colors['two_background'],
-                                        'paper_bgcolor': colors['two_background'],
+                                        'plot_bgcolor': colors['second_background'],
+                                        'paper_bgcolor': colors['second_background'],
                                         'font': {
                                             'color': colors['text_color']
                                         }
@@ -265,7 +265,7 @@ def update_content(category_name):
                         ]),
                     ]
                 ),
-                style={'backgroundColor': colors['background']}
+                style={'backgroundColor': colors['first_background']}
             ),
 
             dbc.Card(
@@ -287,8 +287,8 @@ def update_content(category_name):
                                     ],
                                     'layout': {
                                         'title': 'Contributing to Open Source',
-                                        'plot_bgcolor': colors['two_background'],
-                                        'paper_bgcolor': colors['two_background'],
+                                        'plot_bgcolor': colors['second_background'],
+                                        'paper_bgcolor': colors['second_background'],
                                         'font': {
                                             'color': colors['text_color']
                                         }
@@ -298,10 +298,10 @@ def update_content(category_name):
                         ]),
                     ]
                 ),
-                style={'backgroundColor': colors['background']}
+                style={'backgroundColor': colors['first_background']}
             )
         ]
-    elif category_name == 'Education':
+    elif category_name == 'education':
         return [
             dbc.Card(
                 dbc.CardBody(
@@ -319,8 +319,8 @@ def update_content(category_name):
                                     ],
                                     'layout': {
                                         'title': 'How Many Developers are Students?',
-                                        'plot_bgcolor': colors['two_background'],
-                                        'paper_bgcolor': colors['two_background'],
+                                        'plot_bgcolor': colors['second_background'],
+                                        'paper_bgcolor': colors['second_background'],
                                         'font': {
                                             'color': colors['text_color']
                                         }
@@ -330,7 +330,7 @@ def update_content(category_name):
                         ]),
                     ]
                 ),
-                style={'backgroundColor': colors['background']}
+                style={'backgroundColor': colors['first_background']}
             ),
 
             dbc.Card(
@@ -364,8 +364,8 @@ def update_content(category_name):
                                     ],
                                     'layout': {
                                         'title': 'Educational Attainment',
-                                        'plot_bgcolor': colors['two_background'],
-                                        'paper_bgcolor': colors['two_background'],
+                                        'plot_bgcolor': colors['second_background'],
+                                        'paper_bgcolor': colors['second_background'],
                                         'font': {
                                             'color': colors['text_color']
                                         }
@@ -375,7 +375,7 @@ def update_content(category_name):
                         ]),
                     ]
                 ),
-                style={'backgroundColor': colors['background']}
+                style={'backgroundColor': colors['first_background']}
             ),
 
             dbc.Card(
@@ -410,8 +410,8 @@ def update_content(category_name):
                                     ],
                                     'layout': {
                                         'title': 'Undergraduate Major',
-                                        'plot_bgcolor': colors['two_background'],
-                                        'paper_bgcolor': colors['two_background'],
+                                        'plot_bgcolor': colors['second_background'],
+                                        'paper_bgcolor': colors['second_background'],
                                         'font': {
                                             'color': colors['text_color']
                                         }
@@ -421,7 +421,7 @@ def update_content(category_name):
                         ]),
                     ]
                 ),
-                style={'backgroundColor': colors['background']}
+                style={'backgroundColor': colors['first_background']}
             ),
         ]
     else:
@@ -446,8 +446,8 @@ def update_content(category_name):
                                     ],
                                     'layout': {
                                         'title': 'Years Since Learning to Code',
-                                        'plot_bgcolor': colors['two_background'],
-                                        'paper_bgcolor': colors['two_background'],
+                                        'plot_bgcolor': colors['second_background'],
+                                        'paper_bgcolor': colors['second_background'],
                                         'font': {
                                             'color': colors['text_color']
                                         }
@@ -457,7 +457,7 @@ def update_content(category_name):
                         ]),
                     ]
                 ),
-                style={'backgroundColor': colors['background']}
+                style={'backgroundColor': colors['first_background']}
             ),
 
             dbc.Card(
@@ -480,8 +480,8 @@ def update_content(category_name):
                                     ],
                                     'layout': {
                                         'title': 'Years Coding Professionally',
-                                        'plot_bgcolor': colors['two_background'],
-                                        'paper_bgcolor': colors['two_background'],
+                                        'plot_bgcolor': colors['second_background'],
+                                        'paper_bgcolor': colors['second_background'],
                                         'font': {
                                             'color': colors['text_color']
                                         }
@@ -491,7 +491,7 @@ def update_content(category_name):
                         ]),
                     ]
                 ),
-                style={'backgroundColor': colors['background']}
+                style={'backgroundColor': colors['first_background']}
             )
         ]
 
