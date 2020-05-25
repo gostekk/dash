@@ -214,7 +214,7 @@ def update_content(*args):
             dbc.Card(
                 dbc.CardBody(
                     [
-                        html.Div(className='divs', children=[
+                        html.Div(children=[
                             dcc.Graph(
                                 id='developer_type',
                                 figure={
