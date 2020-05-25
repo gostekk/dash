@@ -1,16 +1,29 @@
 # -*- coding: utf-8 -*-
-import os
+from os import path
 import sqlite3
 from ast import literal_eval
+import os.path
 
 import dash
 import dash_core_components as dcc
 import dash_html_components as html
+import wget
 from dash.dependencies import Input, Output
 import dash_bootstrap_components as dbc
 from flask import Flask, g
 
 DATABASE = './db.sqlite3'
+
+
+def init_db():
+    if not path.exists(DATABASE):
+        url = 'http://51.38.133.46:9000/dash/db.sqlite3'
+        wget.download(url)
+
+    return True
+
+
+init_db()
 
 server = Flask('Dash')
 server.secret_key = os.environ.get('SECRET_KEY', 'secret123')
