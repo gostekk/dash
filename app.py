@@ -28,7 +28,9 @@ init_db()
 server = Flask('Dash')
 server.secret_key = os.environ.get('SECRET_KEY', 'secret123')
 
-app = dash.Dash(__name__, server=server, external_stylesheets=[dbc.themes.DARKLY])
+external_stylesheets = [dbc.themes.DARKLY]
+
+app = dash.Dash(__name__, server=server, external_stylesheets=external_stylesheets)
 
 
 def get_db() -> sqlite3.Connection:
@@ -165,7 +167,9 @@ years_coding_professionally.append(years_code_pro[45][1] + years_code_pro[51][1]
 
 categories = [
     dbc.DropdownMenuItem('Developer Roles', id='developer_roles'),
+    dbc.DropdownMenuItem(divider=True),
     dbc.DropdownMenuItem('Education', id='education'),
+    dbc.DropdownMenuItem(divider=True),
     dbc.DropdownMenuItem('Experience', id='experience')
 ]
 
@@ -210,33 +214,30 @@ def update_content(*args):
             dbc.Card(
                 dbc.CardBody(
                     [
-                        html.Div(children=[
+                        html.Div(className='divs', children=[
                             dcc.Graph(
                                 id='developer_type',
                                 figure={
                                     'data': [
-                                        {'x': ["Full-stack"], 'y': [(len(developer_full_stack) / all_developers) * 100],
+                                        {'x': ['Full-stack'], 'y': [(len(developer_full_stack) / all_developers) * 100],
                                          'type': 'bar', 'name': 'Developer, full-stack'},
-                                        {'x': ["Back-end"], 'y': [(len(developer_back_end) / all_developers) * 100],
-                                         'type': 'bar',
-                                         'name': 'Developer, back-end'},
-                                        {'x': ["Front-end"], 'y': [(len(developer_front_end) / all_developers) * 100],
+                                        {'x': ['Back-end'], 'y': [(len(developer_back_end) / all_developers) * 100],
+                                         'type': 'bar', 'name': 'Developer, back-end'},
+                                        {'x': ['Front-end'], 'y': [(len(developer_front_end) / all_developers) * 100],
                                          'type': 'bar', 'name': 'Developer, front-end'},
-                                        {'x': ["Desktop or enterprise applications"],
+                                        {'x': ['Desktop or enterprise applications'],
                                          'y': [(len(developer_desktop) / all_developers) * 100], 'type': 'bar',
                                          'name': 'Developer, desktop or enterprise applications'},
-                                        {'x': ["Mobile"], 'y': [(len(developer_mobile) / all_developers) * 100],
-                                         'type': 'bar',
-                                         'name': 'Developer, mobile'},
-                                        {'x': ["QA or test"], 'y': [(len(developer_test) / all_developers * 100)],
-                                         'type': 'bar',
-                                         'name': 'Developer, QA or test'},
-                                        {'x': ["Game or graphics"],
+                                        {'x': ['Mobile'], 'y': [(len(developer_mobile) / all_developers) * 100],
+                                         'type': 'bar', 'name': 'Developer, mobile'},
+                                        {'x': ['QA or test'], 'y': [(len(developer_test) / all_developers) * 100],
+                                         'type': 'bar', 'name': 'Developer, QA or test'},
+                                        {'x': ['Game or graphics'],
                                          'y': [(len(developer_game_graphics) / all_developers) * 100],
                                          'type': 'bar', 'name': 'Developer, game or graphics'},
                                     ],
                                     'layout': {
-                                        'title': 'Developer Type',
+                                        'title': 'Developer Type (%)',
                                         'plot_bgcolor': colors['second_background'],
                                         'paper_bgcolor': colors['second_background'],
                                         'font': {
@@ -299,7 +300,7 @@ def update_content(*args):
                                          'type': 'bar', 'name': open_source[3][0]},
                                     ],
                                     'layout': {
-                                        'title': 'Contributing to Open Source',
+                                        'title': 'Contributing to Open Source (%)',
                                         'plot_bgcolor': colors['second_background'],
                                         'paper_bgcolor': colors['second_background'],
                                         'font': {
@@ -356,27 +357,27 @@ def update_content(*args):
                                     'data': [
                                         {'x': ['Any formal education'],
                                          'y': [(educational[2][1] / all_educational) * 100],
-                                         'type': 'bar', 'name': educational[2][0]},
+                                         'type': 'bar', 'name': 'Any formal education'},
                                         {'x': ['Primary school'], 'y': [(educational[5][1] / all_educational) * 100],
-                                         'type': 'bar', 'name': educational[5][0]},
+                                         'type': 'bar', 'name': 'Primary school'},
                                         {'x': ['Secondary school'], 'y': [(educational[7][1] / all_educational) * 100],
-                                         'type': 'bar', 'name': educational[7][0]},
+                                         'type': 'bar', 'name': 'Secondary school'},
                                         {'x': ['Some college'], 'y': [(educational[8][1] / all_educational) * 100],
-                                         'type': 'bar', 'name': educational[8][0]},
+                                         'type': 'bar', 'name': 'Some college'},
                                         {'x': ['Associate degree'], 'y': [(educational[0][1] / all_educational) * 100],
-                                         'type': 'bar', 'name': educational[0][0]},
+                                         'type': 'bar', 'name': 'Associate degree'},
                                         {'x': ["Bachelor's degree"], 'y': [(educational[1][1] / all_educational) * 100],
-                                         'type': 'bar', 'name': educational[1][0]},
+                                         'type': 'bar', 'name': "Bachelor's degree"},
                                         {'x': ['Master degree'], 'y': [(educational[3][1] / all_educational) * 100],
-                                         'type': 'bar', 'name': educational[3][0]},
+                                         'type': 'bar', 'name': 'Master degree'},
                                         {'x': ['Professional degree'],
                                          'y': [(educational[6][1] / all_educational) * 100],
-                                         'type': 'bar', 'name': educational[6][0]},
+                                         'type': 'bar', 'name': 'Professional degree'},
                                         {'x': ['Doctoral degree'], 'y': [(educational[4][1] / all_educational) * 100],
-                                         'type': 'bar', 'name': educational[4][0]},
+                                         'type': 'bar', 'name': 'Doctoral degree'},
                                     ],
                                     'layout': {
-                                        'title': 'Educational Attainment',
+                                        'title': 'Educational Attainment (%)',
                                         'plot_bgcolor': colors['second_background'],
                                         'paper_bgcolor': colors['second_background'],
                                         'font': {
@@ -508,11 +509,6 @@ def update_content(*args):
             )
         ]
 
-
-external_css = ['http://cdn.muicss.com/mui-0.10.2/css/mui.min.css']
-
-for css in external_css:
-    app.css.append_css({"external_url": css})
 
 if __name__ == '__main__':
     app.run_server(
